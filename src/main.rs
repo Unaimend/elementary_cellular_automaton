@@ -18,17 +18,19 @@ impl<const WORLD_SIZE: usize, const PATTERN_SIZE: usize> Runner<WORLD_SIZE, PATT
     println!("Old state {:?}", game.state);
     let mut new_state: [bool; WORLD_SIZE] = [false; WORLD_SIZE];
     for r in &game.rules {
+      let mut ctr: usize = 0;
       loop {
-        let ctr: usize = 0;
         let mut chunk = game.state.last_mut().unwrap().get_chunks_of_size();
-        println!("Chunk {:?}", chunk);
+        println!("Chunk {:?} in_pattern {:?}", chunk, r.in_pattern);
         if let Some(c) = &mut chunk {
           if **c == r.in_pattern {
+            dbg!("HIT");
             new_state[ctr..ctr+PATTERN_SIZE].copy_from_slice(&r.out_pattern);
           }
         } else {
           break;
         }
+      ctr += 1;
       }
     }
     println!("----------------");
@@ -39,25 +41,20 @@ impl<const WORLD_SIZE: usize, const PATTERN_SIZE: usize> Runner<WORLD_SIZE, PATT
 }
 
 fn main() {
-const PATTERN_SIZE: usize = 3;
-const WORLD_SIZE: usize = 10;
+  const PATTERN_SIZE: usize = 3;
+  const WORLD_SIZE: usize = 10;
   let r1 = Pattern {
     id: "r1".into(),
     in_pattern: [false, true, false],
     out_pattern: [false, false, true],
   };
-  let r2 = Pattern {
-    id: "r1".into(),
-    in_pattern: [false, false, true],
-    out_pattern: [false, true, false ],
-  };
-  
-  let mut g: Game<WORLD_SIZE, PATTERN_SIZE> = Game::new(vec![r1,r2]);
+
+  let mut g: Game<WORLD_SIZE, PATTERN_SIZE> = Game::new(vec![r1]);
   let mut r = Runner {
     current_iteration: 0,
   };
   g.state[0].world[1] = true;
-  for i in 0..5{
+  for i in 0..3{
     r.run(&mut g)
   }
   g.to_image("game.p1".into());
