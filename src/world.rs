@@ -30,12 +30,12 @@ where {
     // Now we know self.current_slice_ptr is a valid start index (0 to max_start_index)
     let start = self.current_slice_ptr;
     let end = self.current_slice_ptr + PATTERN_SIZE;
-
     // Advance the pointer for the *next* call
     self.current_slice_ptr += 1;
 
     // Return the mutable slice, converted to an array reference
-    return Some((&mut self.world[start..end]).try_into().unwrap());
+    let c = Some((&mut self.world[start..end]).try_into().unwrap());
+    return c;
   }
 }
 

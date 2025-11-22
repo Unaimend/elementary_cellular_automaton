@@ -6,6 +6,8 @@ mod game;
 use game::*;
 use pattern::*;
 
+use crate::world::World;
+
 
 struct Runner<const WORLD_SIZE: usize, const PATTERN_SIZE: usize> {
   current_iteration: usize,
@@ -13,15 +15,17 @@ struct Runner<const WORLD_SIZE: usize, const PATTERN_SIZE: usize> {
 
 impl<const WORLD_SIZE: usize, const PATTERN_SIZE: usize> Runner<WORLD_SIZE, PATTERN_SIZE> {
   fn run(&mut self, game: &mut Game<WORLD_SIZE, PATTERN_SIZE>) {
+    println!("Old state {:?}", game.state);
+    let mut new_state: [bool; WORLD_SIZE] = [false; WORLD_SIZE];
     for r in &game.rules {
       loop {
-        let mut chunk: Option<&mut [bool; PATTERN_SIZE]> = game.state[self.current_iteration].get_chunks_of_size();
+        let ctr: usize = 0;
+        let mut chunk = game.state.last_mut().unwrap().get_chunks_of_size();
+        println!("Chunk {:?}", chunk);
         if let Some(c) = &mut chunk {
           if **c == r.in_pattern {
-            **c = r.out_pattern;
+            new_state[ctr..ctr+PATTERN_SIZE].copy_from_slice(&r.out_pattern);
           }
-          dbg!(**c);
-          dbg!("-----------");
         } else {
           break;
         }
@@ -29,10 +33,8 @@ impl<const WORLD_SIZE: usize, const PATTERN_SIZE: usize> Runner<WORLD_SIZE, PATT
     }
     println!("----------------");
     // now clone the **modified** state
-    let new_state = game.state[self.current_iteration].clone();
     println!("New state {:?}", new_state);
-    game.state.push(new_state);
-    self.current_iteration += 1;
+    game.state.push(World::new(new_state));
   }
 }
 
@@ -47,11 +49,10 @@ const WORLD_SIZE: usize = 10;
   
   let mut g: Game<WORLD_SIZE, PATTERN_SIZE> = Game::new(vec![r1]);
   let mut r = Runner {
-    current_iteration: 1,
+    current_iteration: 0,
   };
   g.state[0].world[1] = true;
-  g.state[1].world[1] = true;
-  for i in 0..3{
+  for i in 0..5{
     r.run(&mut g)
   }
   g.to_image("game.p1".into());

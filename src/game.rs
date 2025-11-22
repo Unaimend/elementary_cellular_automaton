@@ -19,10 +19,6 @@ impl<const WORLD_SIZE: usize, const PATTERN_SIZE: usize> Game<WORLD_SIZE, PATTER
           world: beginnning_state,
           current_slice_ptr: 0
         },
-        World {
-          world: beginnning_state,
-          current_slice_ptr: 0
-        },
       ],
     }
   }
