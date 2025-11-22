@@ -11,7 +11,7 @@ impl<const WORLD_SIZE: usize, const PATTERN_SIZE: usize> World<WORLD_SIZE, PATTE
 where {
     // SIZE is accessed directly as a value
     Self {
-      world: world,
+      world,
       current_slice_ptr: 0,
     }
   }
@@ -34,8 +34,7 @@ where {
     self.current_slice_ptr += 1;
 
     // Return the mutable slice, converted to an array reference
-    let c = Some(self.world[start..end].try_into().unwrap());
-    return c;
+    Some(self.world[start..end].try_into().unwrap())
   }
 }
 

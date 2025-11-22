@@ -1,4 +1,3 @@
-use std::{fs::File, io::Write, path::PathBuf};
 
 mod world;
 mod pattern;
@@ -12,7 +11,6 @@ use crate::world::World;
 //# One with 1,2,3 as states and modulo to get the next generation
 
 struct NonCenterRunner<const WORLD_SIZE: usize, const PATTERN_SIZE: usize> {
-  current_iteration: usize,
 }
 
 impl<const WORLD_SIZE: usize, const PATTERN_SIZE: usize> NonCenterRunner<WORLD_SIZE, PATTERN_SIZE> {
@@ -40,14 +38,12 @@ fn main() {
   const PATTERN_SIZE: usize = 5;
   const WORLD_SIZE: usize = 500;
   let r1 = Pattern {
-    id: "r1".into(),
     in_pattern: [false, false, true, false, false],
     out_pattern: [false, true, true, true, false],
   };
 
   let mut g: Game<WORLD_SIZE, PATTERN_SIZE> = Game::new(vec![r1]);
   let mut r = NonCenterRunner {
-    current_iteration: 0,
   };
   g.state[0].world[499] = true;
   g.state[0].world[498] = true;
