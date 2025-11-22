@@ -16,7 +16,7 @@ where {
     }
   }
 
-  pub fn get_chunks_of_size<'a>(&'a mut self) -> Option<&'a mut [bool; PATTERN_SIZE]> {
+  pub fn get_chunks_of_size(&mut self) -> Option<&[bool; PATTERN_SIZE]> {
     // Check if the current pointer allows *at least one more* non-wrapping slice of size 1
     // The maximum start index is WORLD_SIZE - PATTERN_SIZE
     let max_start_index = WORLD_SIZE - PATTERN_SIZE;
@@ -34,7 +34,7 @@ where {
     self.current_slice_ptr += 1;
 
     // Return the mutable slice, converted to an array reference
-    let c = Some((&mut self.world[start..end]).try_into().unwrap());
+    let c = Some(self.world[start..end].try_into().unwrap());
     return c;
   }
 }
@@ -45,9 +45,8 @@ mod tests {
 
   #[test]
   fn test_get_chunks() {
-    let mut w: World<3, 3> = World::new([false, false, false]);
-    let c: &mut [bool; 3] = w.get_chunks_of_size().unwrap();
-    c[1] = true;
+    let mut w: World<3, 3> = World::new([false, true, false]);
+    let c: [bool; 3] = *w.get_chunks_of_size().unwrap();
     assert!(w.world == [false, true, false])
   }
 
@@ -55,7 +54,7 @@ mod tests {
   fn test_get_chunks_staying_at_pos() {
     let mut w: World<4, 4> = World::new([false, true, false, false]);
     {
-      let c1: &mut [bool; 4] = w.get_chunks_of_size().unwrap();
+      let c1: &[bool; 4] = w.get_chunks_of_size().unwrap();
       assert!(*c1 == [false, true, false, false]);
     }
     {
@@ -63,7 +62,7 @@ mod tests {
       assert!(c2 == None);
     }
     {
-      let c3: &mut [bool; 4] = w.get_chunks_of_size().unwrap();
+      let c3: &[bool; 4] = w.get_chunks_of_size().unwrap();
       assert!(*c3 == [false, true, false, false]);
     }
   }
@@ -72,12 +71,12 @@ mod tests {
   fn test_get_chunks_wrapping() {
     let mut w: World<5, 4> = World::new([false, true, false, false, true]);
     {
-      let c1: &mut [bool; 4] = w.get_chunks_of_size().unwrap();
+      let c1: &[bool; 4] = w.get_chunks_of_size().unwrap();
       dbg!(*c1);
       assert!(*c1 == [false, true, false, false]);
     }
     {
-      let c2: &mut [bool; 4] = w.get_chunks_of_size().unwrap();
+      let c2: &[bool; 4] = w.get_chunks_of_size().unwrap();
       dbg!(*c2);
       assert!(*c2 == [true, false, false, true]);
     }
