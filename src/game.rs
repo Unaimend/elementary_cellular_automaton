@@ -30,9 +30,11 @@ impl<const WORLD_SIZE: usize, const PATTERN_SIZE: usize> Game<WORLD_SIZE, PATTER
         let _ = fd.write(b"P1\n");
         let _ = write!(fd, "{} {}\n", self.state[0].world.len(), self.state.len());
         for s in self.state {
+          let mut w: String = "".into();
           for b in s.world {
-            let _ = write!(fd, "{} ", if b { 1 } else { 0 });
+            w.push_str( if b {"1"} else {"0"} )
           }
+          let _ = write!(fd, "{}",w);
           let _ = write!(fd, "\n");
         }
       }
