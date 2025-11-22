@@ -46,8 +46,13 @@ const WORLD_SIZE: usize = 10;
     in_pattern: [false, true, false],
     out_pattern: [false, false, true],
   };
+  let r2 = Pattern {
+    id: "r1".into(),
+    in_pattern: [false, false, true],
+    out_pattern: [false, true, false ],
+  };
   
-  let mut g: Game<WORLD_SIZE, PATTERN_SIZE> = Game::new(vec![r1]);
+  let mut g: Game<WORLD_SIZE, PATTERN_SIZE> = Game::new(vec![r1,r2]);
   let mut r = Runner {
     current_iteration: 0,
   };
