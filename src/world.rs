@@ -88,6 +88,18 @@ where {
     return ret.try_into().unwrap();
   }
 
+  pub fn get_chunks_of_size_cyclig(&mut self) -> Option<[bool; PATTERN_SIZE]> {
+    let max_start_index = WORLD_SIZE - 1;
+    if self.current_slice_ptr > max_start_index {
+      // Reset the pointer and fall through to the non-wrapping logic below
+      self.current_slice_ptr = 0;
+      return None;
+    }
+    let ret = self.get_wrapping_chunks_at_pos_i(self.current_slice_ptr);
+    self.current_slice_ptr += 1;
+    Some(ret)
+  }
+
   pub fn get_chunks_of_size(&mut self) -> Option<&[bool; PATTERN_SIZE]> {
     // Check if the current pointer allows *at least one more* non-wrapping slice of size 1
     // The maximum start index is WORLD_SIZE - PATTERN_SIZE
@@ -214,38 +226,38 @@ mod tests {
   fn left_border_wrap_one() {
     let w: World<5, 3> = World::new([true, false, false, false, true]);
     let r1 = w.left_border_wrap(-1);
-    assert_eq!(r1, Some([true, true, false]));
+    assert_eq!(r1, [true, true, false]);
 
     let r2 = w.left_border_wrap(-2);
-    assert_eq!(r2, Some([false, true, true]));
+    assert_eq!(r2, [false, true, true]);
   }
 
   #[test]
   fn left_border_wrap_two() {
     let w: World<5, 5> = World::new([true, false, false, false, true]);
     let r1 = w.left_border_wrap(-1);
-    assert_eq!(r1, Some([true, true, false, false, false]));
+    assert_eq!(r1, [true, true, false, false, false]);
 
     let w: World<5, 5> = World::new([true, false, false, false, true]);
     let r1 = w.left_border_wrap(-2);
-    assert_eq!(r1, Some([false, true, true, false, false]));
+    assert_eq!(r1, [false, true, true, false, false]);
   }
 
   #[test]
   fn right_border_wrap_one() {
     let w: World<5, 3> = World::new([false, false, false, false, true]);
     let r1 = w.right_border_wrap(1);
-    assert_eq!(r1, Some([false, true, false]));
+    assert_eq!(r1, [false, true, false]);
 
     let w: World<5, 5> = World::new([false, false, false, false, true]);
     let r2 = w.right_border_wrap(2);
-    assert_eq!(r2, Some([false, false, true, false, false]));
+    assert_eq!(r2, [false, false, true, false, false]);
   }
   #[test]
   fn right_border_wrap_failing_one() {
     let w: World<5, 5> = World::new([true, false, false, false, true]);
     let r3 = w.right_border_wrap(2);
-    assert_eq!(r3, Some([false, false, true, true, false]));
+    assert_eq!(r3, [false, false, true, true, false]);
   }
 
   #[test]
@@ -318,6 +330,62 @@ mod tests {
       chunk,
       [false, true, false],
       "Should trigger and return the left wrap result."
+    );
+  }
+  #[test]
+  fn test_get_chunks_cycling() {
+    // WORLD: [T, F, F, F, T] (Size 5)
+    // PATTERN: 3. Chunk is [i-1, i, i+1]
+    let mut w: World<5, 3> = World::new([true, false, false, false, true]);
+    let mut results: Vec<[bool; 3]> = Vec::new();
+
+    // Collect all chunks in one cycle (i=0 to i=4)
+    loop {
+      if let Some(chunk) = w.get_chunks_of_size_cyclig() {
+        results.push(chunk);
+      } else {
+        break;
+      }
+    }
+
+    // Expected chunks:
+    // i=0 (L-Wrap): [4, 0, 1] -> [T, T, F]
+    // i=1 (No Wrap): [0, 1, 2] -> [T, F, F]
+    // i=2 (No Wrap): [1, 2, 3] -> [F, F, F]
+    // i=3 (No Wrap): [2, 3, 4] -> [F, F, T]
+    // i=4 (R-Wrap): [3, 4, 0] -> [F, T, T]
+    let expected = vec![
+      [true, true, false],
+      [true, false, false],
+      [false, false, false],
+      [false, false, true],
+      [false, true, true],
+    ];
+
+    // 1. Check that all 5 chunks were returned
+    assert_eq!(
+      results.len(),
+      5,
+      "Should return exactly WORLD_SIZE chunks before resetting."
+    );
+
+    // 2. Check the content of all chunks
+    assert_eq!(
+      results, expected,
+      "The chunks should be correctly extracted and wrapped in order."
+    );
+
+    // 3. Check that the pointer was reset
+    assert_eq!(
+      w.current_slice_ptr, 0,
+      "The pointer should be reset to 0 after the cycle ends."
+    );
+
+    // 4. Check that the next call starts the cycle again
+    assert_eq!(
+      w.get_chunks_of_size_cyclig(),
+      Some([true, true, false]),
+      "The function should immediately start the next cycle (i=0) after reset."
     );
   }
 }
