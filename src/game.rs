@@ -1,8 +1,7 @@
 use std::{fs::File, io::Write, path::PathBuf};
 
-
-use crate::world::*;
 use crate::pattern::*;
+use crate::world::*;
 
 pub struct Game<const WORLD_SIZE: usize, const PATTERN_SIZE: usize> {
   pub rules: Vec<Pattern<PATTERN_SIZE>>,
@@ -14,12 +13,10 @@ impl<const WORLD_SIZE: usize, const PATTERN_SIZE: usize> Game<WORLD_SIZE, PATTER
     let beginnning_state = [false; WORLD_SIZE];
     Game {
       rules,
-      state: vec![
-        World {
-          world: beginnning_state,
-          current_slice_ptr: 0
-        },
-      ],
+      state: vec![World {
+        world: beginnning_state,
+        current_slice_ptr: 0,
+      }],
     }
   }
 
@@ -32,9 +29,9 @@ impl<const WORLD_SIZE: usize, const PATTERN_SIZE: usize> Game<WORLD_SIZE, PATTER
         for s in &self.state {
           let mut w: String = "".into();
           for b in s.world {
-            w.push_str( if b {"1"} else {"0"} )
+            w.push_str(if b { "1" } else { "0" })
           }
-          let _ = write!(fd, "{}",w);
+          let _ = write!(fd, "{}", w);
           let _ = writeln!(fd);
         }
       }
@@ -42,4 +39,3 @@ impl<const WORLD_SIZE: usize, const PATTERN_SIZE: usize> Game<WORLD_SIZE, PATTER
     }
   }
 }
-

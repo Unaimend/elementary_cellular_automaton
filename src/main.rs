@@ -1,7 +1,6 @@
-
-mod world;
-mod pattern;
 mod game;
+mod pattern;
+mod world;
 use game::*;
 use pattern::*;
 
@@ -10,8 +9,7 @@ use crate::world::World;
 //# CENTER version (the coreect one)
 //# One with 1,2,3 as states and modulo to get the next generation
 
-struct NonCenterRunner<const WORLD_SIZE: usize, const PATTERN_SIZE: usize> {
-}
+struct NonCenterRunner<const WORLD_SIZE: usize, const PATTERN_SIZE: usize> {}
 
 impl<const WORLD_SIZE: usize, const PATTERN_SIZE: usize> NonCenterRunner<WORLD_SIZE, PATTERN_SIZE> {
   fn run(&mut self, game: &mut Game<WORLD_SIZE, PATTERN_SIZE>) {
@@ -22,12 +20,12 @@ impl<const WORLD_SIZE: usize, const PATTERN_SIZE: usize> NonCenterRunner<WORLD_S
         let chunk = game.state.last_mut().unwrap().get_chunks_of_size();
         if let Some(c) = chunk {
           if *c == r.in_pattern {
-            new_state[ctr..ctr+PATTERN_SIZE].copy_from_slice(&r.out_pattern);
+            new_state[ctr..ctr + PATTERN_SIZE].copy_from_slice(&r.out_pattern);
           }
         } else {
           break;
         }
-      ctr += 1;
+        ctr += 1;
       }
     }
     game.state.push(World::new(new_state));
@@ -43,15 +41,14 @@ fn main() {
   };
 
   let mut g: Game<WORLD_SIZE, PATTERN_SIZE> = Game::new(vec![r1]);
-  let mut r = NonCenterRunner {
-  };
+  let mut r = NonCenterRunner {};
   g.state[0].world[499] = true;
   g.state[0].world[498] = true;
   g.state[0].world[250] = true;
   g.state[0].world[250] = true;
   g.state[0].world[0] = true;
   g.state[0].world[1] = true;
-  for i in 0..40{
+  for i in 0..40 {
     println!("{:?}", i);
     r.run(&mut g)
   }
@@ -71,7 +68,7 @@ fn main() {
 //};
 //
 //
-// 
+//
 //
 // THICKPINKSKI
 //  let r1 = Pattern {
