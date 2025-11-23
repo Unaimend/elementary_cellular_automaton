@@ -3,13 +3,13 @@ use std::{fs::File, io::Write, path::PathBuf};
 use crate::pattern::*;
 use crate::world::*;
 
-pub struct Game<const WORLD_SIZE: usize, const PATTERN_SIZE: usize> {
-  pub rules: Vec<Pattern<PATTERN_SIZE>>,
+pub struct Game<const WORLD_SIZE: usize, const PATTERN_SIZE: usize, PatternType: Pattern<PATTERN_SIZE>> {
+  pub rules: Vec<PatternType>,
   pub state: Vec<World<WORLD_SIZE, PATTERN_SIZE>>,
 }
 
-impl<const WORLD_SIZE: usize, const PATTERN_SIZE: usize> Game<WORLD_SIZE, PATTERN_SIZE> {
-  pub fn new(rules: Vec<Pattern<PATTERN_SIZE>>) -> Self {
+impl<const WORLD_SIZE: usize, const PATTERN_SIZE: usize, PatternType: Pattern<PATTERN_SIZE>> Game<WORLD_SIZE, PATTERN_SIZE, PatternType> {
+  pub fn new(rules: Vec<PatternType>) -> Self {
     let beginnning_state = [false; WORLD_SIZE];
     Game {
       rules,
