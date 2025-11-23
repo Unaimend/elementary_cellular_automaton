@@ -28,17 +28,17 @@ where {
     }
   }
 
-  fn left_border_wrap(&self, neg_overlap: isize) -> Option<[bool; PATTERN_SIZE]> {
+  fn left_border_wrap(&self, neg_overlap: isize) -> [bool; PATTERN_SIZE] {
     let mut ret = [false; PATTERN_SIZE];
     let mut ctr = 0;
     for index in neg_overlap..neg_overlap + (PATTERN_SIZE as isize) {
       ret[ctr] = *neg_index(&self.world, index).unwrap();
       ctr += 1
     }
-    return Some(ret);
+    return ret;
   }
 
-  fn right_border_wrap(&self, pos_overlap: usize) -> Option<[bool; PATTERN_SIZE]> {
+  fn right_border_wrap(&self, pos_overlap: usize) -> [bool; PATTERN_SIZE] {
     let mut ret = [false; PATTERN_SIZE];
     let mut ctr = 0;
     // Ignore items until this pos
@@ -52,7 +52,7 @@ where {
       ret[ctr] = self.world[idx];
       ctr += 1
     }
-    Some(ret)
+    ret
   }
 
   pub fn neg_overlap(i: usize) -> isize {
@@ -72,7 +72,7 @@ where {
     }
   }
 
-  pub fn get_wrapping_chunks_at_pos_i(&mut self, i: usize) -> Option<[bool; PATTERN_SIZE]> {
+  pub fn get_wrapping_chunks_at_pos_i(&mut self, i: usize) -> [bool; PATTERN_SIZE] {
     // We are tying to an index that is so close to the left border that we wrap around
     let neg_overlap = Self::neg_overlap(i);
     if neg_overlap < 0 {
@@ -85,7 +85,7 @@ where {
     }
     let ret = &self.world[i - PATTERN_SIZE / 2..i + PATTERN_SIZE / 2 + 1];
     assert!(ret.len() == PATTERN_SIZE);
-    return Some(ret.try_into().unwrap());
+    return ret.try_into().unwrap();
   }
 
   pub fn get_chunks_of_size(&mut self) -> Option<&[bool; PATTERN_SIZE]> {
@@ -257,34 +257,24 @@ mod tests {
     // Choose index i=4. Chunk should be world[3..6], which is [F, T, F]
     let i = 4;
 
-    match world.get_wrapping_chunks_at_pos_i(i) {
-      Some(chunk) => {
-        // Expected chunk: [world[3], world[4], world[5]] => [F, T, F]
-        assert_eq!(
-          chunk,
-          [true, false, true],
-          "Should extract chunk without wrapping."
-        );
-      }
-      None => panic!("Expected Some value, got None."),
-    }
+    let chunk = world.get_wrapping_chunks_at_pos_i(i);
+    assert_eq!(
+      chunk,
+      [true, false, true],
+      "Should extract chunk without wrapping."
+    );
 
     let mut world: World<10, 3> = World::new([
       false, true, false, true, false, true, false, true, false, true,
     ]);
     // Choose index i=8. End index i+1 = 9. Should NOT wrap.
     let i = 8;
-    match world.get_wrapping_chunks_at_pos_i(i) {
-      Some(chunk) => {
-        // Expected chunk: [world[7], world[8], world[9]] => [F, T, F]
-        assert_eq!(
-          chunk,
-          [true, false, true],
-          "Should NOT wrap, should extract [F, T, F]."
-        );
-      }
-      _ => (),
-    }
+    let chunk = world.get_wrapping_chunks_at_pos_i(i);
+    assert_eq!(
+      chunk,
+      [true, false, true],
+      "Should NOT wrap, should extract [F, T, F]."
+    );
   }
 
   /// Test the 'Left Wrap' case where the index is too close to the start.
@@ -297,31 +287,23 @@ mod tests {
     // Choose index i=0. Start index i-1 = -1. Should trigger left_border_wrap.
     let i = 0;
 
-    match world.get_wrapping_chunks_at_pos_i(i) {
-      Some(chunk) => {
-        // Should match the mocked return from left_border_wrap
-        assert_eq!(
-          chunk,
-          [true, false, true],
-          "Should trigger and return the left wrap result."
-        );
-      }
-      None => panic!("Expected Some value from left wrap, got None."),
-    }
+    let chunk = world.get_wrapping_chunks_at_pos_i(i);
+    // Should match the mocked return from left_border_wrap
+    assert_eq!(
+      chunk,
+      [true, false, true],
+      "Should trigger and return the left wrap result."
+    );
 
     // Choose index i=1. Start index i-1 = 0. Should NOT wrap.
     let i = 1;
-    match world.get_wrapping_chunks_at_pos_i(i) {
-      Some(chunk) => {
-        // Expected chunk: [world[0], world[1], world[2]] => [T, F, T]
-        assert_eq!(
-          chunk,
-          [false, true, false],
-          "Should NOT wrap, should extract [T, F, T]."
-        );
-      }
-      _ => (), // If it wrapped, the previous assert would fail
-    }
+    let chunk = world.get_wrapping_chunks_at_pos_i(i);
+    // Expected chunk: [world[0], world[1], world[2]] => [T, F, T]
+    assert_eq!(
+      chunk,
+      [false, true, false],
+      "Should NOT wrap, should extract [T, F, T]."
+    );
   }
 
   #[test]
@@ -331,16 +313,11 @@ mod tests {
     ]);
 
     let i = 9;
-    match world.get_wrapping_chunks_at_pos_i(i) {
-      Some(chunk) => {
-        // Should match the mocked return from left_border_wrap
-        assert_eq!(
-          chunk,
-          [false, true, false],
-          "Should trigger and return the left wrap result."
-        );
-      }
-      None => panic!("Expected Some value from left wrap, got None."),
-    }
+    let chunk = world.get_wrapping_chunks_at_pos_i(i);
+    assert_eq!(
+      chunk,
+      [false, true, false],
+      "Should trigger and return the left wrap result."
+    );
   }
 }
