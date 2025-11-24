@@ -9,10 +9,13 @@ I.e. we split the world into chunks of a specified size and based on given patte
 For more information see (Elementary Cellular Automata)[https://en.wikipedia.org/wiki/Elementary_cellular_automaton#]
 
 
+
 # Running the program
 This program has no dependdencies except for standard rust. 
 Game state is saved as a .p1 image, which can, for example, be viewed in (feh)[https://feh.finalrewind.org/]
 ```
 cargo run && feh --force-aliasing game_rule_110.p1
 ```
-## Options
+
+# Example image
+![Rule 110](images/game_rule_110.png)
