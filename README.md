@@ -6,13 +6,13 @@ In each iteration a new array is created as a function of the previous state arr
 
 I.e. we split the world into chunks of a specified size and based on given patterns add the functions output to a new state.
 
-For more information see (Elementary Cellular Automata)[https://en.wikipedia.org/wiki/Elementary_cellular_automaton#]
+For more information see [Elementary Cellular Automata](https://en.wikipedia.org/wiki/Elementary_cellular_automaton#)
 
 
 
 # Running the program
 This program has no dependdencies except for standard rust. 
-Game state is saved as a .p1 image, which can, for example, be viewed in (feh)[https://feh.finalrewind.org/]
+Game state is saved as a .p1 image, which can, for example, be viewed in [feh](https://feh.finalrewind.org/)
 ```
 cargo run && feh --force-aliasing game_rule_110.p1
 ```
